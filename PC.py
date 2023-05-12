@@ -17,8 +17,6 @@ def login(account,password,browser):
     
     #init
     now = str(datetime.now().strftime("%m%d_%H_%M")) 
-    workbook = openpyxl.Workbook()
-    sheet = workbook.active
     os.mkdir(now)
 
     #點擊右上角登入
@@ -48,15 +46,14 @@ def login(account,password,browser):
     #計算場館數量
     WebDriverWait(browser, 30).until(EC.presence_of_element_located((By.CLASS_NAME, 'game-item')))
     game_count = len(browser.find_elements(By.CLASS_NAME,"game-item"))
+    game_name = browser.find_elements(By.CSS_SELECTOR,'h3.title')  
     #進入各場館
     for i in range(0,game_count):
         #調整網頁進入遊戲場館
         WebDriverWait(browser, 30).until(EC.presence_of_element_located((By.CLASS_NAME,"game-item")))
-        game = browser.find_elements(By.CSS_SELECTOR,'h3.title')         
-        
         browser.execute_script("arguments[0].click();", browser.find_elements(By.CLASS_NAME,"game-item")[i])
         browser.execute_script("arguments[0].click();", browser.find_elements(By.CLASS_NAME,"play-btn")[i])
-        name = game[i].text
+        name = game_name[i].text
 
         #調整畫面，並選擇遊戲場館頁面
         browser.switch_to.window(browser.window_handles[1])
@@ -65,12 +62,12 @@ def login(account,password,browser):
         try:
             #等待開始按鈕並點擊
             WebDriverWait(browser, 60).until(EC.presence_of_element_located((By.CLASS_NAME,"start-button-inner")))
-            browser.get_screenshot_as_file('.\\'+now+'\\'+ name +".jpg")
             browser.find_element(By.CLASS_NAME,"start-button-inner").click()
 
             #獲得canvas
             WebDriverWait(browser, 30).until(EC.presence_of_element_located((By.CLASS_NAME,"gameCanvas")))
             canvas = browser.find_element(By.CLASS_NAME,"gameCanvas")
+            browser.get_screenshot_as_file('.\\output\\'+now+'\\'+ name +".jpg")
             time.sleep(0.5)
             #獲取帳戶餘額
             ActionChains(browser).move_to_element_with_offset(canvas,80,620).click().perform()
@@ -91,9 +88,12 @@ def login(account,password,browser):
 
             ActionChains(browser).move_to_element_with_offset(canvas,100,100).click().perform()
             time.sleep(2)
-            #點擊按鈕
-            ActionChains(browser).move_to_element_with_offset(canvas,180,560).click().perform()
-            time.sleep(10)
+
+            #點擊投注按鈕
+            for _ in range(0,3):
+                ActionChains(browser).move_to_element_with_offset(canvas,180,560).click().perform()
+                time.sleep(5)
+            time.sleep(5)
 
             #再次獲取帳戶餘額
             for y in range(620,400,-20):
