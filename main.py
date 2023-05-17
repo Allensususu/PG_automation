@@ -9,14 +9,14 @@ from selenium.webdriver.common.by import By
 import time
 from bs4 import BeautifulSoup as Soup
 import os
-import random, string
-import requests
-import PC
+from module import PC,function
 from webdriver_manager.chrome import ChromeDriverManager
+from datetime import datetime
 
 
-
-
+#init
+now = str(datetime.now().strftime("%m%d_%H_%M")) 
+os.mkdir(".\\output\\" + now)
 url = 'https://www.bsportstest.com/'  
 
 browser = webdriver.Chrome(ChromeDriverManager().install())
@@ -25,5 +25,6 @@ browser.get(url)
 
 if __name__ == '__main__' :
         PC.login("coreycny2","1qaz2wsx",browser)
+        PC.PG_Automation(now,browser)
 
 

@@ -8,17 +8,11 @@ from selenium.webdriver.common.by import By
 import time
 from bs4 import BeautifulSoup as Soup
 import os
-import json
 import re
 from datetime import datetime
-import openpyxl
+from module import function
 
 def login(account,password,browser):
-    
-    #init
-    now = str(datetime.now().strftime("%m%d_%H_%M")) 
-    os.mkdir(now)
-
     #點擊右上角登入
     WebDriverWait(browser, 30).until(EC.presence_of_element_located((By.CLASS_NAME,'login')))
     browser.find_element(By.CLASS_NAME,'login').click()
@@ -38,7 +32,25 @@ def login(account,password,browser):
     WebDriverWait(browser, 30).until(EC.presence_of_element_located((By.CLASS_NAME,"el-button--primary")))
     browser.find_elements(By.CLASS_NAME,"el-button--primary")[0].click()
     time.sleep(0.5)
+
+def language(c,browser):
+    browser.find_elements(By.CLASS_NAME,"lang-selected")[0].click()
+    class_list = browser.find_element(By.CLASS_NAME,"lang-list")
+    divs = class_list.find_elements(By.CSS_SELECTOR,"div")
+    if language == 'Chinese':
+        divs[1].click()
+    elif language == 'English' or language == 'Eng':
+        divs[2].click()
+    elif language == ' Viet':
+        divs[3].click()
+    elif language == 'Thai':
+        divs[4].click()
     
+
+def PG_Automation(now,browser):
+    #init
+    sheet = function.get_sheet(now,"PG")
+
     #跳轉PG電子
     browser.get("https://www.bsportstest.com/digital?gameId=38001&channelId=38&gameType=3&platFormId=38003&gameName=PG%E7%94%B5%E5%AD%90")
     
@@ -102,15 +114,20 @@ def login(account,password,browser):
             balance2 = browser.find_elements(By.CLASS_NAME,"sc-breuTD")[1].text
             balance2  = int(''.join(re.findall(r'\d+',balance2)))
             #balance2  = int(''.join(re.findall(r'\d+', balance2.split('.')[0])))
-
-
+            
             browser.close()
             browser.switch_to.window(browser.window_handles[0])
             time.sleep(3)
-            if balance2 == balance:
-                print("balance error")
+            #寫入資料
+            sheet.range('A'+str(i+2)).value = name
+            if balance2 != balance:
+                sheet.range().value = "PASS"
+            else:   
+                sheet.range('B'+str(i+2)).value = "balance error"
+
         except:
             browser.close()
+            print()
             browser.switch_to.window(browser.window_handles[0])
-            print( name + "error")
-
+            sheet.range('A'+str(i+2)).value = name
+            sheet.range('B'+str(i+2)).value = "error"

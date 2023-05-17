@@ -33,7 +33,7 @@ def login(account,password,browser):
     time.sleep(0.5)
     
     #跳轉PG電子
-    browser.get("https://www.bsportstest.com/digital?gameId=38001&channelId=38&gameType=3&platFormId=38003&gameName=PG%E7%94%B5%E5%AD%90")
+    browser.get("https://m.bsportstest.com/digital?gameId=38001&channelId=38&gameType=3&platFormId=38003&gameName=PG%E7%94%B5%E5%AD%90")
     
 
     #計算場館數量
